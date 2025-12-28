@@ -1,0 +1,23 @@
+# permissions for end users to view chaosexperiments.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: chaos-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: chaosexperiment-viewer-role
+rules:
+- apiGroups:
+  - chaos.chaos.example.com
+  resources:
+  - chaosexperiments
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - chaos.chaos.example.com
+  resources:
+  - chaosexperiments/status
+  verbs:
+  - get

@@ -1,0 +1,13 @@
+apiVersion: chaos.chaos.example.com/v1alpha1
+kind: ChaosExperiment
+metadata:
+  labels:
+    app.kubernetes.io/name: chaos-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: chaosexperiment-sample
+spec:
+  type: pod-kill
+  selector:
+    app: nginx
+  duration: "20s"
+  percentage: 20

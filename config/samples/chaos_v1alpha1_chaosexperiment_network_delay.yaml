@@ -1,0 +1,36 @@
+apiVersion: chaos.chaos.example.com/v1alpha1
+kind: ChaosExperiment
+metadata:
+  labels:
+    app.kubernetes.io/name: chaos-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: chaosexperiment-network-delay-sample
+spec:
+  # Type of chaos to inject
+  type: network-delay
+  
+  # Target pods with this label selector
+  selector:
+    app: nginx
+    
+  
+  # Namespace to target (optional, defaults to same namespace as ChaosExperiment)
+  targetNamespace: chaos
+  
+  # Percentage of pods to affect (1-100)
+  percentage: 50
+  
+  # Total duration of the experiment
+  duration: "1m"
+  
+  # Network delay configuration
+  networkDelay:
+    # Network latency to add (required)
+    latency: "200ms"
+    
+    # Jitter/variation in latency (optional, defaults to 10ms)
+    jitter: "50ms"
+  
+  # Optional: Run chaos continuously at intervals
+  # interval: "30s"  # Uncomment to apply network delay every 30 seconds
+
