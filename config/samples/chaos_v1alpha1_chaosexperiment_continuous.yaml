@@ -1,37 +1,37 @@
-apiVersion: chaos.chaos.example.com/v1alpha1
-kind: ChaosExperiment
-metadata:
-  labels:
-    app.kubernetes.io/name: chaos-operator
-    app.kubernetes.io/managed-by: kustomize
-  name: chaosexperiment-continuous
-  namespace: chaos
-spec:
-  type: pod-kill
-  selector:
-    app: nginx
-  targetNamespace: chaos
-  percentage: 50
-  duration: "2m"           # Total experiment duration: 5 minutes
-  interval: "30s"          # Execute chaos every 30 seconds
----
 # apiVersion: chaos.chaos.example.com/v1alpha1
 # kind: ChaosExperiment
 # metadata:
 #   labels:
 #     app.kubernetes.io/name: chaos-operator
 #     app.kubernetes.io/managed-by: kustomize
-#   name: chaosexperiment-cpu-stress-continuous
+#   name: chaosexperiment-continuous
 #   namespace: chaos
 # spec:
-#   type: cpu-stress
+#   type: pod-kill
 #   selector:
-#     app: myapp
-#   targetNamespace: default
-#   percentage: 30
-#   duration: "10m"          # Total experiment duration: 10 minutes
-#   interval: "1m"           # Execute CPU stress every 1 minute
-#   cpuStress:
-#     workers: 2
-#     load: 80
+#     app: nginx
+#   targetNamespace: chaos
+#   percentage: 50
+#   duration: "2m"           # Total experiment duration: 5 minutes
+#   interval: "30s"          # Execute chaos every 30 seconds
+---
+apiVersion: chaos.chaos.example.com/v1alpha1
+kind: ChaosExperiment
+metadata:
+  labels:
+    app.kubernetes.io/name: chaos-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: chaosexperiment-cpu-stress-continuous
+  namespace: chaos
+spec:
+  type: cpu-stress
+  selector:
+    app: nginx
+  targetNamespace: chaos
+  percentage: 50
+  duration: "3m"          # Total experiment duration: 10 minutes
+  interval: "1m"           # Execute CPU stress every 1 minute
+  cpuStress:
+    workers: 2
+    load: 80
 
