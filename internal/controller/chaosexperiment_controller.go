@@ -263,13 +263,13 @@ func (r *ChaosExperimentReconciler) executeChaos(ctx context.Context, experiment
 
 	// List pods matching the selector
 	podList := &corev1.PodList{}
-	labelSelector := labels.SelectorFromSet(experiment.Spec.Selector)
+	labelSelector := labels.SelectorFromSet(experiment.Spec.Selector) // convert into a selector
 	listOpts := &client.ListOptions{
 		Namespace:     targetNs,
 		LabelSelector: labelSelector,
 	}
 
-	if err := r.List(ctx, podList, listOpts); err != nil {
+	if err := r.List(ctx, podList, listOpts); err != nil { //  Asking for podlist with matching labels and storing the list in podList
 		logger.Error(err, "Failed to list pods")
 		return nil, err
 	}
@@ -284,7 +284,7 @@ func (r *ChaosExperimentReconciler) executeChaos(ctx context.Context, experiment
 	if percentage == 0 {
 		percentage = 100
 	}
-	numToAffect := (len(podList.Items) * percentage) / 100
+	numToAffect := (len(podList.Items) * percentage) / 100 //  Calculate No of Pods
 	if numToAffect <= 0 {
 		numToAffect = 1
 	}
