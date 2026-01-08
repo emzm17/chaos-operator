@@ -318,12 +318,71 @@ func (r *ChaosExperimentReconciler) executeChaos(ctx context.Context, experiment
 			} else {
 				affectedPods = append(affectedPods, pod.Name)
 			}
+		case "memory-stress":
+			if err := r.increaseMemoryStress(ctx, pod, experiment); err != nil {
+				logger.Error(err, "Failed to add memory stress to pod", "pod", pod.Name)
+			} else {
+				affectedPods = append(affectedPods, pod.Name)
+			}
 		default:
 			logger.Info("Unknown chaos type", "type", experiment.Spec.Type)
 		}
 	}
 
 	return affectedPods, nil
+}
+
+func (r *ChaosExperimentReconciler) increaseMemoryStress(ctx context.Context, pod *corev1.Pod, experiment *chaosv1alpha1.ChaosExperiment) error {
+	logger := log.FromContext(ctx)
+	logger.Info("Adding memory stress to Pod", "pod", pod.Name, "namespace", pod.Namespace)
+
+	// Get memory configuration
+	memory := experiment.Spec.MemoryStress.Memory
+	if memory == "" {
+		memory = "256M" // Default memory to consume
+	}
+
+	workers := experiment.Spec.MemoryStress.Workers
+	if workers <= 0 {
+		workers = 1
+	}
+
+	duration, err := time.ParseDuration(experiment.Spec.Duration)
+	if err != nil {
+		logger.Error(err, "Invalid duration, using default 60s", "duration", experiment.Spec.Duration)
+		duration = 60 * time.Second
+	}
+	// Convert duration to int32 seconds for TTL
+	ttl := int32(duration.Seconds())
+
+	memoryStressJob := batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("chaos-memory-stress-%s", pod.Name),
+			Namespace: pod.Namespace,
+		},
+		Spec: batchv1.JobSpec{
+			TTLSecondsAfterFinished: &ttl,
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
+					NodeName:      pod.Spec.NodeName,
+					RestartPolicy: corev1.RestartPolicyNever,
+					Containers: []corev1.Container{{
+						Name:    "memory-stress",
+						Image:   "polinux/stress-ng:latest",
+						Command: []string{"stress-ng", "--vm", fmt.Sprintf("%d", workers), "--vm-bytes", memory, "--timeout", experiment.Spec.Duration},
+					}},
+				},
+			},
+		},
+	}
+
+	if err := r.Create(ctx, &memoryStressJob); err != nil {
+		logger.Error(err, "Failed to create memory stress job")
+		return err
+	}
+
+	logger.Info("Memory stress job created", "memory", memory, "workers", workers, "duration", experiment.Spec.Duration)
+	return nil
 }
 
 func (r *ChaosExperimentReconciler) increaseStress(ctx context.Context, pod *corev1.Pod, experiment *chaosv1alpha1.ChaosExperiment) error {

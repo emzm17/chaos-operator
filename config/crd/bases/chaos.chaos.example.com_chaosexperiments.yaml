@@ -59,6 +59,20 @@ spec:
                   Interval between chaos rounds (e.g., "30s", "1m")
                   If not set, chaos runs only once
                 type: string
+              memoryStress:
+                description: Memory stress configuration (for memory-stress type)
+                properties:
+                  memory:
+                    description: Amount of memory to consume (e.g., "256M", "512M",
+                      "1G")
+                    type: string
+                  workers:
+                    description: Number of workers to spawn
+                    type: integer
+                required:
+                - memory
+                - workers
+                type: object
               networkDelay:
                 description: Network delay configuration (for network-delay type)
                 properties:

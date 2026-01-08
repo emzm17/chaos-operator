@@ -46,9 +46,20 @@ type ChaosExperimentSpec struct {
 	// CPU stress configuration (for cpu-stress type)
 	CPUStress *CPUStressSpec `json:"cpuStress,omitempty"`
 
+	// Memory stress configuration (for memory-stress type)
+	MemoryStress *MemoryStressSpec `json:"memoryStress,omitempty"`
+
 	// Interval between chaos rounds (e.g., "30s", "1m")
 	// If not set, chaos runs only once
 	Interval string `json:"interval,omitempty"`
+}
+
+type MemoryStressSpec struct {
+	// Amount of memory to consume (e.g., "256M", "512M", "1G")
+	Memory string `json:"memory"`
+
+	// Number of workers to spawn
+	Workers int `json:"workers"`
 }
 
 type NetworkDelaySpec struct {
